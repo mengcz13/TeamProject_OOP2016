@@ -2,10 +2,11 @@
 * @Author: mengcz13
 * @Date:   2016-06-08 16:14:03
 * @Last Modified by:   mengcz13
-* @Last Modified time: 2016-06-14 21:29:39
+* @Last Modified time: 2016-06-15 11:43:06
 */
 
 #include "Ttree.h"
+#include "Display.h"
 #include <queue>
 #include <iostream>
 #include <fstream>
@@ -298,6 +299,7 @@ Placer::Placer(string inputfilename, string outputfilename, double initt, double
     outputfile << "Bounding box volume: " << total_volume << endl;
     outputfile << "Use rate: " << net_vol / total_volume * 100 << "%" << endl;
     outputfile.close();
+    showtask(taskvec2, taskvec.size());
     delete []taskvec2;
 }
 
@@ -346,6 +348,7 @@ void Placer::sa_place() {
             }
             else {
                 double dv = newvol - total_volume;
+                dv /= net_vol;
                 double ap = exp(-dv/temp);
                 double randp = (double)rand() / (double)RAND_MAX;
                 if (randp < ap)

@@ -1,10 +1,10 @@
-1 1 1 1 0 0 
-1 1 1 0 0 2 
-2 1 1 0 0 1 
-1 1 1 0 0 0 
-1 1 3 1 0 2 
-1 1 1 0 0 3 
-1 1 1 0 0 4 
-Net volume: 10
-Bounding box volume: 10
-Use rate: 100%
+2 2 1 0 3 7 
+2 2 2 0 3 1 
+3 3 4 0 0 4 
+2 2 2 0 3 5 
+2 2 2 0 3 3 
+3 3 3 0 0 1 
+2 2 1 0 0 0 
+Net volume: 95
+Bounding box volume: 120
+Use rate: 79.1667%

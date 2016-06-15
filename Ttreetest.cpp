@@ -2,7 +2,7 @@
 * @Author: mengcz13
 * @Date:   2016-06-09 11:00:36
 * @Last Modified by:   mengcz13
-* @Last Modified time: 2016-06-14 20:08:48
+* @Last Modified time: 2016-06-15 11:24:44
 */
 
 #include <iostream>
@@ -21,18 +21,5 @@ int main(int argc, char** argv) {
     }
     srand(time(NULL));
     Placer placer(argv[1], argv[2], atof(argv[3]), atof(argv[4]), atof(argv[5]));
-
-
-    // Task* taskvec = new Task[4];
-    // for (int i = 0; i < 4; ++i) {
-    //     taskvec[i].X = taskvec[i].Y = taskvec[i].T = 1;
-    // }
-    // taskvec[1].Y = 2;
-    // taskvec[2].X = 2;
-    // taskvec[2].T = 2;
-    // taskvec[3].T = 2;
-    // Ttree ttree(taskvec, 4);
-    // double pack = ttree.pack();
-    // cout << pack << endl;
     return 0;
 }
