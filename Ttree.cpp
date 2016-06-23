@@ -214,6 +214,7 @@ int Ttree::remove_node(int rank) {
     for (int i = 0; i < tasknum; ++i)
         if (&pool[i] == node)
             return i;
+    return 0;
 }
 
 void Ttree::insert_node(int rank_src, int rank_dst, int childth) {
@@ -375,6 +376,7 @@ void Placer::sa_place() {
         }
         temp *= alpha;
         cout << net_vol / total_volume << endl;
+        
     }
     total_volume = current_ttree->pack();
 }

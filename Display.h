@@ -1,7 +1,11 @@
 #ifndef DISPLAY_H
 #define DISPLAY_H
 #include <cstdlib>
-#include <GL/glut.h>
+// windows headers
+//#include <GL/glut.h>
+// mac headers
+#include <GLUT/glut.h>
+
 #include "Ttree.h"
 
 // Task vector
@@ -130,7 +134,8 @@ void showtask(Task* taskvec2, int tnum) {
     tasknum = tnum;
     // init GLUT and create window
     int argc = 1;
-    glutInit(&argc, NULL);
+    char *argv[] = {"a", "b"};
+    glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_DEPTH | GLUT_DOUBLE | GLUT_RGBA);
     glutInitWindowPosition(100,100);
     glutInitWindowSize(600,600);
