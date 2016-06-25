@@ -22,38 +22,88 @@ float angle = 0.0f;
 float angle2 = 0.0f;
 float angle3 = 0.0f;
 
-float scale = 0.3;
+float scale = 1;
 
 void drawWireBlock(double ox, double oy, double oz, double x, double y, double z) {
-    glColor3f(red,green,blue);
+    //glColor3f(red,green,blue);
+    
     glBegin(GL_LINES);
-        glVertex3f(ox, oy, oz);
-        glVertex3f(ox + x, oy, oz);
-        glVertex3f(ox, oy + y, oz);
-        glVertex3f(ox + x, oy + y, oz);
-        glVertex3f(ox, oy, oz + z);
-        glVertex3f(ox + x, oy, oz + z);
-        glVertex3f(ox, oy + y, oz + z);
-        glVertex3f(ox + x, oy + y, oz + z);
-
-        glVertex3f(ox, oy, oz);
-        glVertex3f(ox, oy + y, oz);
-        glVertex3f(ox + x, oy, oz);
-        glVertex3f(ox + x, oy + y, oz);
-        glVertex3f(ox, oy, oz + z);
-        glVertex3f(ox, oy + y, oz + z);
-        glVertex3f(ox + x, oy, oz + z);
-        glVertex3f(ox + x, oy + y, oz + z);
-
-        glVertex3f(ox, oy, oz);
-        glVertex3f(ox, oy, oz + z);
-        glVertex3f(ox + x, oy, oz);
-        glVertex3f(ox + x, oy, oz + z);
-        glVertex3f(ox, oy + y, oz);
-        glVertex3f(ox, oy + y, oz + z);
-        glVertex3f(ox + x, oy + y, oz);
-        glVertex3f(ox + x, oy + y, oz + z);
+    glVertex3f(ox, oy, oz);
+    glVertex3f(ox + x, oy, oz);
+    glVertex3f(ox, oy + y, oz);
+    glVertex3f(ox + x, oy + y, oz);
+    glVertex3f(ox, oy, oz + z);
+    glVertex3f(ox + x, oy, oz + z);
+    glVertex3f(ox, oy + y, oz + z);
+    glVertex3f(ox + x, oy + y, oz + z);
+    
+    glVertex3f(ox, oy, oz);
+    glVertex3f(ox, oy + y, oz);
+    glVertex3f(ox + x, oy, oz);
+    glVertex3f(ox + x, oy + y, oz);
+    glVertex3f(ox, oy, oz + z);
+    glVertex3f(ox, oy + y, oz + z);
+    glVertex3f(ox + x, oy, oz + z);
+    glVertex3f(ox + x, oy + y, oz + z);
+    
+    glVertex3f(ox, oy, oz);
+    glVertex3f(ox, oy, oz + z);
+    glVertex3f(ox + x, oy, oz);
+    glVertex3f(ox + x, oy, oz + z);
+    glVertex3f(ox, oy + y, oz);
+    glVertex3f(ox, oy + y, oz + z);
+    glVertex3f(ox + x, oy + y, oz);
+    glVertex3f(ox + x, oy + y, oz + z);
     glEnd();
+}
+
+void drawFaceBlock(double ox, double oy, double oz, double x, double y, double z) {
+    glPushMatrix();
+    glTranslatef(ox,oy,oz);
+    glBegin(GL_QUADS);    //顶面
+    glNormal3f(0.0f,2.0f,0.0f);
+    glVertex3f(x,y,z);
+    glVertex3f(x,y,0.0f);
+    glVertex3f(0.0f,y,0.0f);
+    glVertex3f(0.0f,y,z);
+    glEnd();
+    glBegin(GL_QUADS);    //底面
+    glNormal3f(0.0f,-2.0f,0.0f);
+    glVertex3f(x,0.0f,z);
+    glVertex3f(0.0f,0.0f,z);
+    glVertex3f(0.0f,0.0f,0.0f);
+    glVertex3f(x,0.0f,0.0f);
+    glEnd();
+    glBegin(GL_QUADS);    //前面
+    glNormal3f(0.0f,0.0f,2.0f);
+    glVertex3f(x,y,z);
+    glVertex3f(0.0f,y,z);
+    glVertex3f(0.0f,0.0f,z);
+    glVertex3f(x,0.0f,z);
+    glEnd();
+    glBegin(GL_QUADS);    //背面
+    glNormal3f(0.0f,0.0f,-2.0f);
+    glVertex3f(x,y,0.0f);
+    glVertex3f(x,0.0f,0.0f);
+    glVertex3f(0.0f,0.0f,0.0f);
+    glVertex3f(0.0f,y,0.0f);
+    glEnd();
+    glBegin(GL_QUADS);    //左面
+    glNormal3f(-2.0f,0.0f,0.0f);
+    glVertex3f(0.0f,y,z);
+    glVertex3f(0.0f,y,0.0f);
+    glVertex3f(0.0f,0.0f,0.0f);
+    glVertex3f(0.0f,0.0f,z);
+    glEnd();
+    glBegin(GL_QUADS);    //右面
+    glNormal3f(2.0f,0.0f,0.0f);
+    glVertex3f(x,y,z);
+    glVertex3f(x,0.0f,z);
+    glVertex3f(x,0.0f,0.0f);
+    glVertex3f(x,y,0.0f);
+    glEnd();
+    glPopMatrix();
+    
 }
 
 void changeSize(int w, int h) {
@@ -143,12 +193,6 @@ void MouseMotion(int x, int y) {
 }
 
 void renderScene(void) {
-    
-    // antialiasing
-    glEnable(GL_LINE_SMOOTH);
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    glHint(GL_LINE_SMOOTH_HINT, GL_DONT_CARE);
 
     // Clear Color and Depth Buffers
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -167,6 +211,11 @@ void renderScene(void) {
     glRotatef(angle3, 0.0f, 0.0f, 1.0f);
 
     //drawWireBlock(0, 0, 0, 1, 2, 3);
+    glEnable(GL_LIGHT0);
+    for (int i = 0; i < tasknum; ++i) {
+        drawFaceBlock(taskvec[i].o.x*scale, taskvec[i].o.y*scale, taskvec[i].o.t*scale, taskvec[i].X*scale, taskvec[i].Y*scale, taskvec[i].T*scale);
+    }
+    glDisable(GL_LIGHT0);
     for (int i = 0; i < tasknum; ++i) {
         drawWireBlock(taskvec[i].o.x*scale, taskvec[i].o.y*scale, taskvec[i].o.t*scale, taskvec[i].X*scale, taskvec[i].Y*scale, taskvec[i].T*scale);
     }
@@ -187,6 +236,18 @@ void processNormalKeys(unsigned char key, int x, int y) {
 
     if (key == 27)
         exit(0);
+    if (key == 'l') {
+        GLint params[] = {GL_POLYGON_MODE, GL_FILL};
+        glGetIntegerv(GL_POLYGON_MODE, params);
+        if (*(params) == GL_FILL) {
+            glPolygonMode(GL_FRONT_AND_BACK ,GL_POINT);
+            glDisable(GL_LIGHTING);
+        }
+        else {
+            glPolygonMode(GL_FRONT_AND_BACK ,GL_FILL);
+            glEnable(GL_LIGHTING);
+        }
+    }
 }
 
 void processSpecialKeys(int key, int x, int y) {
@@ -201,6 +262,14 @@ void processSpecialKeys(int key, int x, int y) {
     }
 }
 
+// light variables
+float ambientLight[]={0.1f,0.3f,0.8f,1.0f};
+float diffuseLight[]={0.25f,0.25f,0.25f,1.0f};
+float lightPosition[]={0.0f,0.0f,1.0f,0.0f};
+// material variables
+float matAmbient[]={1.0f,1.0f,1.0f,0.7f};
+float matDiff[]={1.0f,1.0f,1.0f,0.7f};
+
 void showtask(Task* taskvec2, int tnum) {
     taskvec = taskvec2;
     tasknum = tnum;
@@ -212,6 +281,26 @@ void showtask(Task* taskvec2, int tnum) {
     glutInitWindowPosition(100,100);
     glutInitWindowSize(600,600);
     glutCreateWindow("Display");
+    
+    // antialiasing
+    glEnable(GL_LINE_SMOOTH);
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glHint(GL_LINE_SMOOTH_HINT, GL_DONT_CARE);
+    
+    //light and material
+    glShadeModel(GL_SMOOTH);
+    //glEnable(GL_DEPTH_TEST);
+    glEnable(GL_CULL_FACE);
+    glFrontFace(GL_CCW);
+    glEnable(GL_LIGHTING);
+    
+    glMaterialfv(GL_FRONT,GL_AMBIENT,matAmbient);
+    glMaterialfv(GL_FRONT,GL_DIFFUSE,matDiff);
+    glLightfv(GL_LIGHT0,GL_AMBIENT,ambientLight);
+    glLightfv(GL_LIGHT0,GL_DIFFUSE,diffuseLight);
+    glLightfv(GL_LIGHT0,GL_POSITION,lightPosition);
+    
 
     // register callbacks
     glutDisplayFunc(renderScene);
