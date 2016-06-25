@@ -7,6 +7,7 @@
 #include <GLUT/glut.h>
 
 #include "Ttree.h"
+#include <cmath>
 
 // Task vector
 Task* taskvec;
@@ -79,6 +80,68 @@ void changeSize(int w, int h) {
     glMatrixMode(GL_MODELVIEW);
 }
 
+const GLfloat PI = 3.14;
+
+// record the state of mouse
+GLboolean mouserdown = GL_FALSE;
+GLboolean mouseldown = GL_FALSE;
+GLboolean mousemdown = GL_FALSE;
+
+// when a mouse-key is pressed, record current mouse position
+static GLint mousex = 0, mousey = 0;
+
+static GLfloat center[3] = {0.0f, 0.0f, 0.0f}; /// center position
+static GLfloat eye[3]; /// eye's position
+
+static GLfloat yrotate = PI/4; /// angle between y-axis and look direction
+static GLfloat xrotate = PI/4; /// angle between x-axis and look direction
+static GLfloat celength = 20.0f;/// lenght between center and eye
+
+static GLfloat mSpeed = 0.4f; /// center move speed
+static GLfloat rSpeed = 0.02f; /// rotate speed
+static GLfloat lSpeed = 0.4f; /// reserved
+
+// calculate the eye position according to center position and angle,length
+void CalEyePosition() {
+    if(yrotate > PI) yrotate = PI; // restrict rotation
+    if(yrotate < 0.01)  yrotate = 0.01;
+    if(xrotate > 2*PI)   xrotate = 0.01;
+    if(xrotate < 0)   xrotate = 2 * PI; 
+    if(celength > 50)  celength = 50; // restrict scaling
+    if(celength < 5)   celength = 5;
+    eye[0] = center[0] + celength * sin(yrotate) * cos(xrotate);
+    eye[2] = center[2] + celength * sin(yrotate) * sin(xrotate);
+    eye[1] = center[1] + celength * cos(yrotate);
+}
+
+void MouseFunc(int button, int state, int x, int y) {
+    if(state == GLUT_DOWN) {
+        if(button == GLUT_RIGHT_BUTTON) mouserdown = GL_TRUE;
+        if(button == GLUT_LEFT_BUTTON) mouseldown = GL_TRUE;
+        if(button == GLUT_MIDDLE_BUTTON)mousemdown = GL_TRUE;
+    }
+    else {
+        if(button == GLUT_RIGHT_BUTTON) mouserdown = GL_FALSE;
+        if(button == GLUT_LEFT_BUTTON) mouseldown = GL_FALSE;
+        if(button == GLUT_MIDDLE_BUTTON)mousemdown = GL_FALSE;
+    }
+    mousex = x, mousey = y;
+}
+
+void MouseMotion(int x, int y) {
+    if(mouserdown == GL_TRUE) {
+        xrotate += (x - mousex) / 80.0f;
+        yrotate -= (y - mousey) / 120.0f;
+    }
+    
+    if(mouseldown == GL_TRUE) {
+        celength += (y - mousey) / 25.0f;
+    }
+    mousex = x, mousey = y;
+    CalEyePosition();
+    glutPostRedisplay();
+}
+
 void renderScene(void) {
     
     // antialiasing
@@ -94,9 +157,10 @@ void renderScene(void) {
     glLoadIdentity();
 
     // Set the camera
-    gluLookAt(  0.0f, 0.0f, 10.0f,
-            0.0f, 0.0f,  0.0f,
-            0.0f, 1.0f,  0.0f);
+    CalEyePosition();
+    gluLookAt(eye[0], eye[1], eye[2],
+              center[0], center[1], center[2],
+              0, 1, 0);
 
     glRotatef(angle, 0.0f, 1.0f, 0.0f);
     glRotatef(angle2, 1.0f, 0.0f, 0.0f);
@@ -153,6 +217,9 @@ void showtask(Task* taskvec2, int tnum) {
     glutDisplayFunc(renderScene);
     glutReshapeFunc(changeSize);
     glutIdleFunc(renderScene);
+    
+    glutMouseFunc(MouseFunc);
+    glutMotionFunc(MouseMotion);
 
     // here are the new entries
     glutKeyboardFunc(processNormalKeys);

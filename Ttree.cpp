@@ -161,7 +161,7 @@ void Ttree::place_module(TtreeNode* node, Contour& blist) {
         // T== Y== and X + direction
         node->task->o = node->parent->task->o;
         node->task->o.x = find_max_x(node);
-        blist.insert(node);
+        //blist.insert(node);
     }
     placed.push_back(node);
 }
@@ -357,7 +357,7 @@ void Placer::sa_place() {
     total_volume = current_ttree->pack();
     double temp = initial_temp;
     int blocknum = current_ttree->getnum();
-    int psize = current_ttree->getnum() * 100;
+    int psize = current_ttree->getnum() * 20;
     
     int count = 0;
     double rate = 0;
@@ -423,12 +423,16 @@ void Placer::sa_place() {
         temp *= alpha;
         if (rate == net_vol / total_volume) {
             count++;
+        } else {
+            count = 0;
         }
         rate = net_vol / total_volume;
         cout << rate << " " << temp << endl;
-        if (count >= 100) {
+        if (count > 0 && count % 100 == 0) {
             temp /= pow(alpha, 50);
-            count = 0;
+        }
+        if (count >= 1000) {
+            break;
         }
     }
     total_volume = current_ttree->pack();
