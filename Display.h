@@ -21,6 +21,8 @@ float angle = 0.0f;
 float angle2 = 0.0f;
 float angle3 = 0.0f;
 
+float scale = 0.3;
+
 void drawWireBlock(double ox, double oy, double oz, double x, double y, double z) {
     glColor3f(red,green,blue);
     glBegin(GL_LINES);
@@ -78,6 +80,12 @@ void changeSize(int w, int h) {
 }
 
 void renderScene(void) {
+    
+    // antialiasing
+    glEnable(GL_LINE_SMOOTH);
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glHint(GL_LINE_SMOOTH_HINT, GL_DONT_CARE);
 
     // Clear Color and Depth Buffers
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -96,7 +104,7 @@ void renderScene(void) {
 
     //drawWireBlock(0, 0, 0, 1, 2, 3);
     for (int i = 0; i < tasknum; ++i) {
-        drawWireBlock(taskvec[i].o.x / 5, taskvec[i].o.y/5, taskvec[i].o.t/5, taskvec[i].X/5, taskvec[i].Y/5, taskvec[i].T/5);
+        drawWireBlock(taskvec[i].o.x*scale, taskvec[i].o.y*scale, taskvec[i].o.t*scale, taskvec[i].X*scale, taskvec[i].Y*scale, taskvec[i].T*scale);
     }
 
     // glColor3f(red,green,blue);

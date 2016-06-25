@@ -7,6 +7,7 @@
 
 #include <iostream>
 #include <string>
+#include <sstream>
 #include <fstream>
 #include <cstdlib>
 #include <ctime>
@@ -15,11 +16,23 @@
 using namespace std;
 
 int main(int argc, char** argv) {
-    if (argc != 6) {
+    srand(time(NULL));
+    if (argc == 6) {
+        Placer placer(argv[1], argv[2], atof(argv[3]), atof(argv[4]), atof(argv[5]));
+    }
+    else if (argc == 4) {
+        for (int i = 0; i < 10; i++) {
+            stringstream ss;
+            ss << i+1 << ".txt";
+            Placer placer("test/input" + ss.str(), "output/output" + ss.str(), atof(argv[1]), atof(argv[2]), atof(argv[3]));
+        }
+    }
+    else {
         cout << "Usage: ./main <inputfile> <outputfile> <initial temperature> <final temperature> <alpha>" << endl;
+        cout << "Usage: ./main <initial temperature> <final temperature> <alpha>" << endl;
         return -1;
     }
-    srand(time(NULL));
-    Placer placer(argv[1], argv[2], atof(argv[3]), atof(argv[4]), atof(argv[5]));
+    
+    
     return 0;
 }

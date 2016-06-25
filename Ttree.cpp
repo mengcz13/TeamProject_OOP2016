@@ -16,6 +16,8 @@
 #include <cstdlib>
 #include <algorithm>
 
+#include <chrono>
+
 using namespace std;
 
 Ttree::Ttree(Task* taskvec, int tnum) {
@@ -229,7 +231,7 @@ void Ttree::insert_node(int rank_src, int rank_dst, int childth) {
     }
 }
 
-double Contour::insert(TtreeNode* node) {
+/*double Contour::insert(TtreeNode* node) {
     double maxy = 0;
     double nodest = node->task->o.t;
     double nodeet = nodest + node->task->T;
@@ -239,6 +241,7 @@ double Contour::insert(TtreeNode* node) {
             double yb = cnode.task->o.y + cnode.task->Y;
             if (yb > maxy)
                 maxy = yb;
+            break; //!
         }
     }
     auto insertp = conlist.end();
@@ -262,10 +265,45 @@ double Contour::insert(TtreeNode* node) {
     newnode.et = nodeet;
     conlist.insert(insertp, newnode);
     return maxy;
+}*/
+
+double Contour::insert(TtreeNode* node) {
+    double nodest = node->task->o.t;
+    double nodeet = nodest + node->task->T;
+    if (cont.empty()) {
+        cont.push_back(make_pair(nodest, node->task->Y));
+        cont.push_back(make_pair(nodeet, 0));
+        return 0;
+    }
+    
+    auto bg = cont.begin();
+    while (bg != cont.end() && bg->first <= nodest) {
+        bg++;
+    }
+    bg--;
+    double maxy = bg->second;;
+    /*auto ed = bg;
+    while (ed != cont.end() && ed->first < nodeet) {
+        if (ed->second > maxy) maxy = ed->second;
+        if (ed->first >= nodeet)
+            ed = cont.erase(ed);
+        else
+            ed++;
+    }*/
+    cont.insert(bg, make_pair(nodest, maxy + node->task->Y));
+    //ed--;
+    //cont.insert(ed, make_pair(nodeet, ed->second));
+    /*for (auto it = ++cont.find(nodest); it != cont.find(nodeet);) {
+        it = cont.erase(it);
+    }*/
+    return maxy;
 }
+
 
 Placer::Placer(string inputfilename, string outputfilename, double initt, double finalt, double alpha): initial_temp(initt), final_temp(finalt), alpha(alpha) {
     // read blocks and output result
+    chrono::high_resolution_clock timer;
+    
     ifstream inputfile(inputfilename.c_str());
     double x = 0, y = 0, t = 0;
     net_vol = 0;
@@ -284,7 +322,11 @@ Placer::Placer(string inputfilename, string outputfilename, double initt, double
         taskvec2[i] = taskvec.at(i);
     current_ttree = new Ttree(taskvec2, taskvec.size());
     backup_ttree = new Ttree(taskvec2, taskvec.size());
+    
+    auto start = timer.now();
     sa_place();
+    auto end = timer.now();
+    chrono::duration<double> diff = end - start;
 
     ofstream outputfile(outputfilename.c_str());
     for (int i = 0; i < taskvec.size(); ++i) {
@@ -299,6 +341,7 @@ Placer::Placer(string inputfilename, string outputfilename, double initt, double
     outputfile << "Net volume: " << net_vol << endl;
     outputfile << "Bounding box volume: " << total_volume << endl;
     outputfile << "Use rate: " << net_vol / total_volume * 100 << "%" << endl;
+    outputfile << "Runtime: " << diff.count() << "s" << endl;
     outputfile.close();
     showtask(taskvec2, taskvec.size());
     delete []taskvec2;
@@ -315,6 +358,9 @@ void Placer::sa_place() {
     double temp = initial_temp;
     int blocknum = current_ttree->getnum();
     int psize = current_ttree->getnum() * 100;
+    
+    int count = 0;
+    double rate = 0;
     while (temp > final_temp) {
         for (int changetime = 0; changetime < psize; ++changetime) {
             // (*backup_ttree) = (*current_ttree);
@@ -375,8 +421,15 @@ void Placer::sa_place() {
             }
         }
         temp *= alpha;
-        cout << net_vol / total_volume << endl;
-        
+        if (rate == net_vol / total_volume) {
+            count++;
+        }
+        rate = net_vol / total_volume;
+        cout << rate << " " << temp << endl;
+        if (count >= 100) {
+            temp /= pow(alpha, 50);
+            count = 0;
+        }
     }
     total_volume = current_ttree->pack();
 }

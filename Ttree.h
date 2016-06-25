@@ -6,6 +6,7 @@
 #include <string>
 #include <cstring>
 #include <stack>
+#include <map>
 
 struct Point3d {
     double x, y, t;
@@ -57,7 +58,7 @@ private:
     void insert_node(int rank_src, int rank_dst, int childth);
 };
 
-struct ContourNode {
+/*struct ContourNode {
     Task* task;
     double st;
     double et;
@@ -68,7 +69,15 @@ public:
     double insert(TtreeNode* node); // Update contour and return the y position for the new block
 private:
     std::list<ContourNode> conlist;
+};*/
+
+class Contour {
+public:
+    double insert(TtreeNode* node);
+private:
+    std::list<std::pair<double, double>> cont;
 };
+
 
 class Placer {
 public:
