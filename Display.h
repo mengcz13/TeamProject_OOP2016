@@ -1,10 +1,14 @@
 #ifndef DISPLAY_H
 #define DISPLAY_H
 #include <cstdlib>
-// windows headers
-//#include <GL/glut.h>
+// Linux headers
+#ifdef __gnu_linux__
+#include <GL/glut.h>
+#endif
 // mac headers
+#ifdef __APPLE__
 #include <GLUT/glut.h>
+#endif
 
 #include "Ttree.h"
 #include <cmath>

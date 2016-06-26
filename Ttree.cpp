@@ -2,7 +2,7 @@
 * @Author: mengcz13
 * @Date:   2016-06-08 16:14:03
 * @Last Modified by:   mengcz13
-* @Last Modified time: 2016-06-15 11:43:06
+* @Last Modified time: 2016-06-26 11:01:14
 */
 
 #include "Ttree.h"
@@ -50,10 +50,6 @@ Ttree::~Ttree() {
     delete []pool;
 }
 
-// void Ttree::transform() {
-
-// }
-
 double Ttree::pack() {
     stack<TtreeNode*> res;
     res.push(root);
@@ -93,7 +89,6 @@ Ttree& Ttree::operator = (const Ttree& ttree) {
 
 void Ttree::transform_move(int rank1, int rank2, int childth) {
     int actual_rank1 = remove_node(rank1);
-    // cout << actual_rank1 << endl;
     while (rank2 == actual_rank1)
         rank2 = rand() % tasknum;
     insert_node(actual_rank1, rank2, childth);
@@ -126,7 +121,6 @@ TtreeNode* Ttree::tree_decomposition(TtreeNode* node, stack<TtreeNode*>&  res) {
 void Ttree::binary_tree_packing(TtreeNode* node) {
     stack<TtreeNode*> temps;
     temps.push(node);
-    // list<TtreeNode*> blist;
     Contour blist;
     while (!temps.empty()) {
         TtreeNode* cn = temps.top();
@@ -140,7 +134,6 @@ void Ttree::binary_tree_packing(TtreeNode* node) {
 }
 
 void Ttree::place_module(TtreeNode* node, Contour& blist) {
-    // to be continued...
     if (node->parent == NULL) {
         node->task->o = Point3d(0, 0, 0);
         blist.insert(node);
@@ -161,7 +154,6 @@ void Ttree::place_module(TtreeNode* node, Contour& blist) {
         // T== Y== and X + direction
         node->task->o = node->parent->task->o;
         node->task->o.x = find_max_x(node);
-        //blist.insert(node);
     }
     placed.push_back(node);
 }
@@ -182,20 +174,6 @@ double Ttree::find_max_x(TtreeNode* node) {
     return maxx;
 }
 
-double Ttree::find_max_y(TtreeNode* node, list<TtreeNode*>& blist) {
-    double maxy = 0;
-    double t0l = node->task->o.t, t0r = t0l + node->task->T;
-    for (auto it = blist.begin(); it != blist.end(); ++it) {
-        double t1l = (*it)->task->o.t, t1r = t1l + (*it)->task->T;
-        if (t1r > t0l && t1l < t0r) {
-            double yb = (*it)->task->o.y + (*it)->task->Y;
-            if (yb > maxy)
-                maxy = yb;
-        }
-    }
-    return maxy;
-}
-
 int Ttree::remove_node(int rank) {
     TtreeNode* node = &pool[rank];
     while (!(node->child[0] == NULL && node->child[1] == NULL && node->child[2] == NULL)) {
@@ -213,10 +191,7 @@ int Ttree::remove_node(int rank) {
         }
     }
     node->parent = NULL;
-    for (int i = 0; i < tasknum; ++i)
-        if (&pool[i] == node)
-            return i;
-    return 0;
+    return (node - pool);
 }
 
 void Ttree::insert_node(int rank_src, int rank_dst, int childth) {
@@ -230,42 +205,6 @@ void Ttree::insert_node(int rank_src, int rank_dst, int childth) {
         child->parent = source;
     }
 }
-
-/*double Contour::insert(TtreeNode* node) {
-    double maxy = 0;
-    double nodest = node->task->o.t;
-    double nodeet = nodest + node->task->T;
-    for (auto it = conlist.begin(); it != conlist.end(); ++it) {
-        ContourNode& cnode = (*it);
-        if (cnode.et > nodest && cnode.st < nodeet) {
-            double yb = cnode.task->o.y + cnode.task->Y;
-            if (yb > maxy)
-                maxy = yb;
-            break; //!
-        }
-    }
-    auto insertp = conlist.end();
-    for (auto it = conlist.begin(); it != conlist.end(); ) {
-        ContourNode& cnode = (*it);
-        if (cnode.st >= nodest && cnode.et <= nodeet) {
-            it = conlist.erase(it);
-        }
-        else if (cnode.st <= nodeet && cnode.et > nodeet) {
-            cnode.st = nodeet;
-            insertp = it;
-            ++it;
-        }
-        else {
-            ++it;
-        }
-    }
-    ContourNode newnode;
-    newnode.task = node->task;
-    newnode.st = nodest;
-    newnode.et = nodeet;
-    conlist.insert(insertp, newnode);
-    return maxy;
-}*/
 
 double Contour::insert(TtreeNode* node) {
     double nodest = node->task->o.t;
@@ -282,20 +221,7 @@ double Contour::insert(TtreeNode* node) {
     }
     bg--;
     double maxy = bg->second;;
-    /*auto ed = bg;
-    while (ed != cont.end() && ed->first < nodeet) {
-        if (ed->second > maxy) maxy = ed->second;
-        if (ed->first >= nodeet)
-            ed = cont.erase(ed);
-        else
-            ed++;
-    }*/
     cont.insert(bg, make_pair(nodest, maxy + node->task->Y));
-    //ed--;
-    //cont.insert(ed, make_pair(nodeet, ed->second));
-    /*for (auto it = ++cont.find(nodest); it != cont.find(nodeet);) {
-        it = cont.erase(it);
-    }*/
     return maxy;
 }
 
@@ -317,9 +243,10 @@ Placer::Placer(string inputfilename, string outputfilename, double initt, double
         taskvec.push_back(task);
     }
     inputfile.close();
-    Task* taskvec2 = new Task[taskvec.size()];
+    taskvec2 = new Task[taskvec.size()];
     for (int i = 0; i < taskvec.size(); ++i)
         taskvec2[i] = taskvec.at(i);
+    tasknum = taskvec.size();
     current_ttree = new Ttree(taskvec2, taskvec.size());
     backup_ttree = new Ttree(taskvec2, taskvec.size());
     
@@ -327,6 +254,8 @@ Placer::Placer(string inputfilename, string outputfilename, double initt, double
     sa_place();
     auto end = timer.now();
     chrono::duration<double> diff = end - start;
+
+    check_result();
 
     ofstream outputfile(outputfilename.c_str());
     for (int i = 0; i < taskvec.size(); ++i) {
@@ -344,12 +273,12 @@ Placer::Placer(string inputfilename, string outputfilename, double initt, double
     outputfile << "Runtime: " << diff.count() << "s" << endl;
     outputfile.close();
     showtask(taskvec2, taskvec.size());
-    delete []taskvec2;
 }
 
 Placer::~Placer() {
     delete current_ttree;
     delete backup_ttree;
+    delete []taskvec2;
 }
 
 void Placer::sa_place() {
@@ -363,10 +292,7 @@ void Placer::sa_place() {
     double rate = 0;
     while (temp > final_temp) {
         for (int changetime = 0; changetime < psize; ++changetime) {
-            // (*backup_ttree) = (*current_ttree);
-            // current_ttree->transform();
             // Randomly choose one way to transform
-            // ...
             int way = rand() % 3;
             int rank1 = rand() % blocknum;
             int rank2 = rand() % blocknum;
@@ -407,7 +333,6 @@ void Placer::sa_place() {
                 total_volume = newvol;
             }
             else {
-                // (*current_ttree) = (*backup_ttree);
                 // Restore if necessary
                 if (way == 0) {
                     (*current_ttree) = (*backup_ttree);
@@ -436,4 +361,18 @@ void Placer::sa_place() {
         }
     }
     total_volume = current_ttree->pack();
+}
+
+void Placer::check_result() {
+    for (int i = 0; i < tasknum; ++i) {
+        for (int j = i + 1; j < tasknum; ++j) {
+            Task& t1 = taskvec2[i];
+            Task& t2 = taskvec2[j];
+            if (t1.o.x < t2.o.x + t2.X && t1.o.x + t1.X > t2.o.x && t1.o.y < t2.o.y + t2.Y && t1.o.y + t1.Y > t2.o.y && t1.o.t < t2.o.t + t2.T && t1.o.t + t1.T > t2.o.t) {
+                cout << "Check fali at task " << i << " and task " << j << " !" << endl;
+                return;
+            }
+        }
+    }
+    cout << "Check passed!" << endl;
 }

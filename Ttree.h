@@ -53,23 +53,9 @@ private:
     void binary_tree_packing(TtreeNode* node);
     void place_module(TtreeNode* node, Contour& blist);
     double find_max_x(TtreeNode* node);
-    double find_max_y(TtreeNode* node, std::list<TtreeNode*>& blist); // Naive version, without contour
     int remove_node(int rank);
     void insert_node(int rank_src, int rank_dst, int childth);
 };
-
-/*struct ContourNode {
-    Task* task;
-    double st;
-    double et;
-};
-
-class Contour {
-public:
-    double insert(TtreeNode* node); // Update contour and return the y position for the new block
-private:
-    std::list<ContourNode> conlist;
-};*/
 
 class Contour {
 public:
@@ -78,15 +64,17 @@ private:
     std::list<std::pair<double, double>> cont;
 };
 
-
 class Placer {
 public:
     Placer(std::string inputfilename, std::string outputfilename, double initt, double finalt, double alpha);
     ~Placer();
 private:
     void sa_place();
+    void check_result();
     double total_volume;
     double net_vol;
+    Task* taskvec2;
+    int tasknum;
     Ttree* current_ttree;
     Ttree* backup_ttree;
     double initial_temp;
