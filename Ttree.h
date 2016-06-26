@@ -6,7 +6,7 @@
 #include <string>
 #include <cstring>
 #include <stack>
-#include <map>
+#include <array>
 
 struct Point3d {
     double x, y, t;
@@ -43,6 +43,7 @@ public:
     double pack();
     Ttree& operator = (const Ttree& ttree);
     int getnum() { return tasknum; }
+    std::array<double, 3> getsize() {return {bx, by, bt};}
 private:
     TtreeNode* pool;
     TtreeNode* root;

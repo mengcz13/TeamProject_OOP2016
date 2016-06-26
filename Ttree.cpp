@@ -6,7 +6,6 @@
 */
 
 #include "Ttree.h"
-#include "Display.h"
 #include <queue>
 #include <iostream>
 #include <fstream>
@@ -258,6 +257,11 @@ Placer::Placer(string inputfilename, string outputfilename, double initt, double
     check_result();
 
     ofstream outputfile(outputfilename.c_str());
+    
+    auto size = current_ttree->getsize();
+    outputfile << size[0] << ' ' <<
+    size[1] << ' ' << size[2] << "\n" << tasknum << "\n" << endl;
+    
     for (int i = 0; i < taskvec.size(); ++i) {
         outputfile << taskvec2[i].X << ' ' 
         << taskvec2[i].Y << ' ' 
@@ -267,12 +271,12 @@ Placer::Placer(string inputfilename, string outputfilename, double initt, double
         << taskvec2[i].o.t << ' ' 
         << endl;
     }
+    
     outputfile << "Net volume: " << net_vol << endl;
     outputfile << "Bounding box volume: " << total_volume << endl;
     outputfile << "Use rate: " << net_vol / total_volume * 100 << "%" << endl;
     outputfile << "Runtime: " << diff.count() << "s" << endl;
     outputfile.close();
-    showtask(taskvec2, taskvec.size());
 }
 
 Placer::~Placer() {

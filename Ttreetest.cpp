@@ -12,6 +12,7 @@
 #include <cstdlib>
 #include <ctime>
 #include "Ttree.h"
+#include "Display.h"
 
 using namespace std;
 
@@ -19,6 +20,7 @@ int main(int argc, char** argv) {
     srand(time(NULL));
     if (argc == 6) {
         Placer placer(argv[1], argv[2], atof(argv[3]), atof(argv[4]), atof(argv[5]));
+        showtask(argv[2]);
     }
     else if (argc == 4) {
         for (int i = 0; i < 10; i++) {
@@ -28,8 +30,9 @@ int main(int argc, char** argv) {
         }
     }
     else {
-        cout << "Usage: ./main <inputfile> <outputfile> <initial temperature> <final temperature> <alpha>" << endl;
-        cout << "Usage: ./main <initial temperature> <final temperature> <alpha>" << endl;
+        cout << "Usage:\n";
+        cout << "Test one case:\n./main <inputfile> <outputfile> <initial temperature> <final temperature> <alpha>" << endl;
+        cout << "Load default test cases:\n./main <initial temperature> <final temperature> <alpha>" << endl;
         return -1;
     }
     

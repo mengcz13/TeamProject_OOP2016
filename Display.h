@@ -12,10 +12,15 @@
 
 #include "Ttree.h"
 #include <cmath>
+#include <string>
+#include <fstream>
+
+using namespace std;
 
 // Task vector
 Task* taskvec;
 int tasknum;
+double bx, by, bt;
 
 // all variables initialized to 1.0, meaning
 // the triangle will initially be white
@@ -28,9 +33,7 @@ float angle3 = 0.0f;
 
 float scale = 1;
 
-void drawWireBlock(double ox, double oy, double oz, double x, double y, double z) {
-    //glColor3f(red,green,blue);
-    
+void drawLines(double ox, double oy, double oz, double x, double y , double z) {
     glBegin(GL_LINES);
     glVertex3f(ox, oy, oz);
     glVertex3f(ox + x, oy, oz);
@@ -61,7 +64,24 @@ void drawWireBlock(double ox, double oy, double oz, double x, double y, double z
     glEnd();
 }
 
-void drawFaceBlock(double ox, double oy, double oz, double x, double y, double z) {
+void drawWireBlock(Task& t) {
+    double ox = t.o.x*scale, oy = t.o.y*scale, oz = t.o.t*scale;
+    double x = t.X*scale, y = t.Y*scale, z = t.T*scale;
+    glColor3f(red,green,blue);
+    
+    drawLines(ox, oy, oz, x, y, z);
+}
+
+void drawContainer() {
+    glColor3f(red,0.0f,blue);
+    
+    drawLines(0, 0, 0, bx*scale, by*scale, bt*scale);
+}
+
+void drawFaceBlock(Task& t) {
+    double ox = t.o.x*scale, oy = t.o.y*scale, oz = t.o.t*scale;
+    double x = t.X*scale, y = t.Y*scale, z = t.T*scale;
+    
     glPushMatrix();
     glTranslatef(ox,oy,oz);
     glBegin(GL_QUADS);    //顶面
@@ -197,6 +217,7 @@ void MouseMotion(int x, int y) {
 }
 
 void renderScene(void) {
+    
 
     // Clear Color and Depth Buffers
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -205,11 +226,12 @@ void renderScene(void) {
     glLoadIdentity();
 
     // Set the camera
+    
     CalEyePosition();
     gluLookAt(eye[0], eye[1], eye[2],
               center[0], center[1], center[2],
               0, 1, 0);
-
+    
     glRotatef(angle, 0.0f, 1.0f, 0.0f);
     glRotatef(angle2, 1.0f, 0.0f, 0.0f);
     glRotatef(angle3, 0.0f, 0.0f, 1.0f);
@@ -217,21 +239,13 @@ void renderScene(void) {
     //drawWireBlock(0, 0, 0, 1, 2, 3);
     glEnable(GL_LIGHT0);
     for (int i = 0; i < tasknum; ++i) {
-        drawFaceBlock(taskvec[i].o.x*scale, taskvec[i].o.y*scale, taskvec[i].o.t*scale, taskvec[i].X*scale, taskvec[i].Y*scale, taskvec[i].T*scale);
+        drawFaceBlock(taskvec[i]);
     }
     glDisable(GL_LIGHT0);
     for (int i = 0; i < tasknum; ++i) {
-        drawWireBlock(taskvec[i].o.x*scale, taskvec[i].o.y*scale, taskvec[i].o.t*scale, taskvec[i].X*scale, taskvec[i].Y*scale, taskvec[i].T*scale);
+        drawWireBlock(taskvec[i]);
     }
-
-    // glColor3f(red,green,blue);
-    // glBegin(GL_TRIANGLES);
-    //  glVertex3f(-2.0f,-2.0f, 0.0f);
-    //  glVertex3f( 2.0f, 0.0f, 0.0);
-    //  glVertex3f( 0.0f, 2.0f, 0.0);
-    // glEnd();
-
-    //angle+=0.1f;
+    drawContainer();
 
     glutSwapBuffers();
 }
@@ -274,10 +288,18 @@ float lightPosition[]={0.0f,0.0f,1.0f,0.0f};
 float matAmbient[]={1.0f,1.0f,1.0f,0.7f};
 float matDiff[]={1.0f,1.0f,1.0f,0.7f};
 
-void showtask(Task* taskvec2, int tnum) {
-    taskvec = taskvec2;
-    tasknum = tnum;
-    // init GLUT and create window
+void showtask(string fname) {
+    ifstream resultfile(fname);
+    
+    resultfile >> bx >> by >> bt >> tasknum;
+    
+    taskvec = new Task[tasknum];
+    for (int i = 0; i < tasknum; ++i) {
+        resultfile >> taskvec[i].X >> taskvec[i].Y >> taskvec[i].T;
+        resultfile >> taskvec[i].o.x >> taskvec[i].o.y >> taskvec[i].o.t;
+    }
+    resultfile.close();
+    // init GLUT and create wi ndow
     int argc = 1;
     char *argv[] = {"a", "b"};
     glutInit(&argc, argv);
@@ -297,14 +319,15 @@ void showtask(Task* taskvec2, int tnum) {
     //glEnable(GL_DEPTH_TEST);
     glEnable(GL_CULL_FACE);
     glFrontFace(GL_CCW);
-    glEnable(GL_LIGHTING);
+    
+    glPolygonMode(GL_FRONT_AND_BACK ,GL_POINT);
+    glDisable(GL_LIGHTING);
     
     glMaterialfv(GL_FRONT,GL_AMBIENT,matAmbient);
     glMaterialfv(GL_FRONT,GL_DIFFUSE,matDiff);
     glLightfv(GL_LIGHT0,GL_AMBIENT,ambientLight);
     glLightfv(GL_LIGHT0,GL_DIFFUSE,diffuseLight);
     glLightfv(GL_LIGHT0,GL_POSITION,lightPosition);
-    
 
     // register callbacks
     glutDisplayFunc(renderScene);
