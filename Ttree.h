@@ -81,6 +81,9 @@ private:
     double initial_temp;
     double final_temp;
     double alpha;
+    
+    double coef;
+    double gettimes(double);
 };
 
 #endif

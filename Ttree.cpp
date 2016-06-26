@@ -285,12 +285,18 @@ Placer::~Placer() {
     delete []taskvec2;
 }
 
+
+double Placer::gettimes(double temp) {
+    return coef * pow(temp - initial_temp, 2) + 10;
+}
+
 void Placer::sa_place() {
     // simulated annealing place
     total_volume = current_ttree->pack();
     double temp = initial_temp;
     int blocknum = current_ttree->getnum();
-    int psize = current_ttree->getnum() * 20;
+    coef = 15/pow(initial_temp - final_temp, 2);
+    int psize = current_ttree->getnum() * gettimes(temp);
     
     int count = 0;
     double rate = 0;
