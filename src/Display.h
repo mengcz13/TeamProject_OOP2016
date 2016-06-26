@@ -164,16 +164,16 @@ GLboolean mousemdown = GL_FALSE;
 // when a mouse-key is pressed, record current mouse position
 static GLint mousex = 0, mousey = 0;
 
-static GLfloat center[3] = {0.0f, 0.0f, 0.0f}; /// center position
-static GLfloat eye[3]; /// eye's position
+static GLfloat center[3] = {0.0f, 0.0f, 0.0f}; // center position
+static GLfloat eye[3]; // eye's position
 
-static GLfloat yrotate = PI/4; /// angle between y-axis and look direction
-static GLfloat xrotate = PI/4; /// angle between x-axis and look direction
-static GLfloat celength = 20.0f;/// lenght between center and eye
+static GLfloat yrotate = PI/4; // angle between y-axis and look direction
+static GLfloat xrotate = PI/4; // angle between x-axis and look direction
+static GLfloat celength = 20.0f;// lenght between center and eye
 
-static GLfloat mSpeed = 0.4f; /// center move speed
-static GLfloat rSpeed = 0.02f; /// rotate speed
-static GLfloat lSpeed = 0.4f; /// reserved
+static GLfloat mSpeed = 0.4f; // center move speed
+static GLfloat rSpeed = 0.02f; // rotate speed
+static GLfloat lSpeed = 0.4f; // reserved
 
 // calculate the eye position according to center position and angle,length
 void CalEyePosition() {

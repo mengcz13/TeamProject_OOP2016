@@ -26,7 +26,7 @@ int main(int argc, char** argv) {
         for (int i = 0; i < 10; i++) {
             stringstream ss;
             ss << i+1 << ".txt";
-            Placer placer("test/input" + ss.str(), "output/output" + ss.str(), atof(argv[1]), atof(argv[2]), atof(argv[3]));
+            Placer placer("../test/input" + ss.str(), "../output/output" + ss.str(), atof(argv[1]), atof(argv[2]), atof(argv[3]));
         }
     }
     else {
